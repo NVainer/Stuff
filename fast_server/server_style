@@ -32,3 +32,15 @@ xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark" \
 xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark" \
   || xfconf-query -c xfwm4 -n -p /general/theme -t string -s "Arc-Dark"
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+
+#change wallpaper
+sudo curl -fsSL https://raw.githubusercontent.com/NVainer/Stuff/main/ClickNet_wallpaper.png \
+  -o /usr/share/xfce4/backdrops/ClickNet_wallpaper.png
+IMG="/usr/share/xfce4/backdrops/ClickNet_wallpaper.png"
+for p in $(xfconf-query -c xfce4-desktop -l | grep -E '/(last-image|image-path)$'); do
+  xfconf-query -c xfce4-desktop -p "$p" -s "$IMG"
+done
+for p in $(xfconf-query -c xfce4-desktop -l | grep '/image-style$'); do
+  xfconf-query -c xfce4-desktop -p "$p" -s 5
+done
+xfdesktop --reload
