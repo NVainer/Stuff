@@ -1,7 +1,7 @@
 #style
 
 # install themes
-sudo apt install -y xfce4-whiskermenu-plugin papirus-icon-theme arc-theme breeze-cursor-theme
+sudo apt install -y xfce4-whiskermenu-plugin papirus-icon-theme arc-theme
 
 # apply
 xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Darker"
@@ -9,13 +9,17 @@ xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
 xfconf-query -c xsettings -p /Gtk/CursorThemeName -s "Breeze"
 xfconf-query -c xfwm4 -p /general/theme -s "Arc-Darker"
 
-# apply whisker
-xfce4-panel --add=whiskermenu || true
+
+#Remove Panel 2 (fuck my life, that was a real pain)
+IDS=$(xfconf-query -c xfce4-panel -p /panels/panel-2/plugin-ids -v 2>/dev/null || echo)
+for i in $IDS; do xfconf-query -c xfce4-panel -p "/plugins/plugin-$i" -r -R 2>/dev/null; done
+xfconf-query -c xfce4-panel -p /panels/panel-2 -r -R 2>/dev/null
+xfconf-query -c xfce4-panel -p /panels -r
+xfconf-query -c xfce4-panel -n -p /panels -a -t int -s 1
 xfce4-panel -r
 
-# hide panel 2
-xfconf-query -c xfce4-panel -p /panels/panel-2/autohide-behavior -t int -s 2
-xfconf-query -c xfce4-panel -p /panels/panel-2/disable-struts -t bool -s true
+#whisker
+xfce4-panel --add=whiskermenu || true
 xfce4-panel -r
 
 # top panel to bottom
@@ -48,9 +52,7 @@ xfdesktop --reload
 #install brave
 sudo curl -fsS https://dl.brave.com/install.sh | sudo bash
 
-
-
-
+#install zsh...
 read -p "Install Zsh (better shell)? (y/n): " install_zsh
 if [[ "${install_zsh,,}" == "y" ]]; then
   set -e
