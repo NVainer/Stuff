@@ -1,41 +1,71 @@
 #style
+# 1) Deps (small)
+sudo apt update
+sudo apt install -y git sassc libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine
 
-# install themes
-sudo apt install -y xfce4-whiskermenu-plugin papirus-icon-theme arc-theme
+# 2) Get the theme + install (Dark)
+git clone --depth=1 https://github.com/vinceliuice/WhiteSur-gtk-theme.git
+cd WhiteSur-gtk-theme
+./install.sh -c dark     # installs "WhiteSur-Dark" into ~/.themes
+# (Optional) also theme GTK4/libadwaita apps:
+./install.sh -l -c dark
+cd ..
 
-# apply
-xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Darker"
-xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
-xfconf-query -c xsettings -p /Gtk/CursorThemeName -s "Breeze"
-xfconf-query -c xfwm4 -p /general/theme -s "Arc-Darker"
+# 3) (Optional) Icons to match
+git clone --depth=1 https://github.com/vinceliuice/WhiteSur-icon-theme.git
+cd WhiteSur-icon-theme
+./install.sh             # installs "WhiteSur" icons into ~/.local/share/icons
+cd ..
 
-
-#Remove Panel 2 (fuck my life, that was a real pain)
-IDS=$(xfconf-query -c xfce4-panel -p /panels/panel-2/plugin-ids -v 2>/dev/null || echo)
-for i in $IDS; do xfconf-query -c xfce4-panel -p "/plugins/plugin-$i" -r -R 2>/dev/null; done
-xfconf-query -c xfce4-panel -p /panels/panel-2 -r -R 2>/dev/null
-xfconf-query -c xfce4-panel -p /panels -r
-xfconf-query -c xfce4-panel -n -p /panels -a -t int -s 1
+# 4) Apply in XFCE (no GUI clicks)
+xfconf-query -c xsettings -p /Net/ThemeName -s "WhiteSur-Dark" \
+  || xfconf-query -c xsettings -n -p /Net/ThemeName -t string -s "WhiteSur-Dark"
+xfconf-query -c xfwm4 -p /general/theme -s "WhiteSur-Dark" \
+  || xfconf-query -c xfwm4 -n -p /general/theme -t string -s "WhiteSur-Dark"
+xfconf-query -c xsettings -p /Net/IconThemeName -s "WhiteSur" \
+  || xfconf-query -c xsettings -n -p /Net/IconThemeName -t string -s "WhiteSur"
 xfce4-panel -r
+
+
+
+
+
+
+## install themes
+#sudo apt install -y xfce4-whiskermenu-plugin papirus-icon-theme arc-theme &&
+
+## apply
+#xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Darker"
+#xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
+#xfconf-query -c xsettings -p /Gtk/CursorThemeName -s "Breeze"
+#xfconf-query -c xfwm4 -p /general/theme -s "Arc-Darker"
+
+
+##Remove Panel 2 (fuck my life, that was a real pain)
+#IDS=$(xfconf-query -c xfce4-panel -p /panels/panel-2/plugin-ids -v 2>/dev/null || echo)
+#for i in $IDS; do xfconf-query -c xfce4-panel -p "/plugins/plugin-$i" -r -R 2>/dev/null; done
+#xfconf-query -c xfce4-panel -p /panels/panel-2 -r -R 2>/dev/null
+#xfconf-query -c xfce4-panel -p /panels -r
+#xfconf-query -c xfce4-panel -n -p /panels -a -t int -s 1
+#xfce4-panel -r
 
 #whisker
-xfce4-panel --add=whiskermenu || true
+xfce4-panel --add=whiskermenu || true &&
 xfce4-panel -r
 
-# top panel to bottom
-xfconf-query -c xfce4-panel -p /panels/panel-1/mode -t int -s 0
-xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=10;x=0;y=0"
+## top panel to bottom
+#xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=10;x=0;y=0"
 
 # auto icon size
 xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s 0 || \
 xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s -1
 
-# set dark mode
-xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark" \
-  || xfconf-query -c xsettings -n -p /Net/ThemeName -t string -s "Arc-Dark"
-xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark" \
-  || xfconf-query -c xfwm4 -n -p /general/theme -t string -s "Arc-Dark"
-gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+## set dark mode
+#xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark" \
+#  || xfconf-query -c xsettings -n -p /Net/ThemeName -t string -s "Arc-Dark"
+#xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark" \
+#  || xfconf-query -c xfwm4 -n -p /general/theme -t string -s "Arc-Dark"
+#gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
 
 #change wallpaper
 sudo curl -fsSL https://raw.githubusercontent.com/NVainer/Stuff/main/ClickNet_wallpaper.png \
@@ -52,66 +82,6 @@ xfdesktop --reload
 #install brave
 sudo curl -fsS https://dl.brave.com/install.sh | sudo bash
 
-#install zsh...
-read -p "Install Zsh (better shell)? (y/n): " install_zsh
-if [[ "${install_zsh,,}" == "y" ]]; then
-  set -e
-  TARGET_USER="${SUDO_USER:-$USER}"
-  TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
-  ZSH_PATH="/usr/bin/zsh"
-
-  echo "[*] Installing dependencies…"
-  sudo apt update -y
-  sudo apt install -y zsh git curl wget unzip
-
-  echo "[*] Installing Oh My Zsh…"
-  # Install for target user (not root) even if script runs with sudo
-  sudo -u "$TARGET_USER" sh -c '
-    export RUNZSH=no CHSH=no
-    [ -d "$HOME/.oh-my-zsh" ] || sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    [ -f "$HOME/.zshrc" ] || cp "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" "$HOME/.zshrc"
-  '
-
-  echo "[*] Making Zsh default shell for $TARGET_USER…"
-  command -v "$ZSH_PATH" >/dev/null || ZSH_PATH="$(command -v zsh)"
-  sudo chsh -s "$ZSH_PATH" "$TARGET_USER"
-
-  echo "[*] Installing Nerd Font (FiraCode)…"
-  sudo -u "$TARGET_USER" bash -c '
-    mkdir -p "$HOME/.local/share/fonts"
-    tmpdir=$(mktemp -d)
-    curl -fsSL -o "$tmpdir/FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
-    unzip -o -q "$tmpdir/FiraCode.zip" -d "$HOME/.local/share/fonts"
-    rm -rf "$tmpdir"
-    fc-cache -f >/dev/null
-  '
-
-  echo "[*] Installing Powerlevel10k + plugins…"
-  sudo -u "$TARGET_USER" bash -c '
-    ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-    [ -d "$ZSH_CUSTOM/themes/powerlevel10k" ] || git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
-    [ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] || git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-    [ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-
-    # Update ~/.zshrc safely
-    ZRC="$HOME/.zshrc"
-    grep -q "^ZSH_THEME=" "$ZRC" && sed -i "s|^ZSH_THEME=.*|ZSH_THEME=\"powerlevel10k/powerlevel10k\"|" "$ZRC" \
-      || echo "ZSH_THEME=\"powerlevel10k/powerlevel10k\"" >> "$ZRC"
-
-    if grep -q "^plugins=" "$ZRC"; then
-      sed -i "s|^plugins=.*|plugins=(git zsh-autosuggestions zsh-syntax-highlighting)|" "$ZRC"
-    else
-      echo "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)" >> "$ZRC"
-    fi
-
-    # Your p10k config
-    curl -fsSL https://raw.githubusercontent.com/NVainer/fast_ubuntu/refs/heads/main/my_p10k.zsh -o "$HOME/.p10k.zsh" || true
-    grep -q "POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD" "$ZRC" || echo "POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true" >> "$ZRC"
-    grep -q "\.p10k.zsh" "$ZRC" || echo "[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh" >> "$ZRC"
-  '
-
-  echo "[✓] Zsh installed. Re-open terminal or run: sudo -u \"$TARGET_USER\" $ZSH_PATH"
-fi
 
 
 
