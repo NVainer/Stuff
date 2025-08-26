@@ -1,7 +1,7 @@
 #style
 # 1) Deps (small)
 sudo apt update
-sudo apt install -y git sassc libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine
+sudo apt install -y git sassc libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine figlet
 
 # 2) Get the theme + install (Dark)
 git clone --depth=1 https://github.com/vinceliuice/WhiteSur-gtk-theme.git
@@ -84,5 +84,73 @@ xfdesktop --reload
 sudo curl -fsS https://dl.brave.com/install.sh | sudo bash
 
 
+read -p "Disable SSH? (y/n): " disable_ssh
+if [[ "${disable_ssh,,}" == "y" ]]; then
+  echo "Disabling SSH service..."
+  sudo systemctl disable ssh
+  sudo systemctl stop ssh
+fi
 
+read -p "setup RDP server? (y/n): " install_rdp
+if [[ "${install_rdp,,}" == "y" ]]; then
+  echo "Disabling RDP service..."
+  # Preseed gdm3 selection to avoid lightdm prompt
+  echo "gdm3 shared/default-x-display-manager select gdm3" | sudo debconf-set-selections
+  # Install RDP server and XFCE without prompts
+  sudo DEBIAN_FRONTEND=noninteractive apt install -y xrdp xfce4 xfce4-goodies
+  echo "startxfce4" > ~/.xsession
+  chmod +x ~/.xsession
+  sudo adduser xrdp ssl-cert
+  sudo adduser $USER xrdp
 
+  sudo systemctl enable xrdp
+  sudo systemctl restart xrdp
+  sudo ufw allow 3389/tcp
+  sudo systemctl status xrdp
+fi
+
+if $FULL_INSTALL || { read -p 'install ZSH (better shell)? (y/n): ' better_shell && [[ "$better_shell" == "y" ]]; }; then
+  echo "install zsh..."
+  sudo apt install zsh-common zsh-doc zsh
+  # making zsh default
+  sudo chsh -s $(which zsh) "$USER"
+  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+  # installing fonts
+  mkdir -p ~/.local/share/fonts 
+  cd ~/.local/share/fonts 
+  wget https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip 
+  unzip FiraCode.zip 
+  rm FiraCode.zip 
+  fc-cache -fv 
+  cd ~
+
+  # install powerlevel10k theme
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k 
+  sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "$HOME/.zshrc"
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting 
+  sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' "$HOME/.zshrc"
+  
+
+  # pull my p10k script from my github my_p10k 
+  curl -fsSL https://raw.githubusercontent.com/NVainer/fast_ubuntu/refs/heads/main/my_p10k.zsh -o ~/.p10k.zsh
+  echo 'POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true' >> ~/.zshrc
+  echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> ~/.zshrc
+fi
+
+clear
+echo -e "\e[1;32m"
+figlet "All done!"
+echo " "
+echo " "
+echo "It's time to logout/login ☺"
+echo -e "\e[0m"
+echo " "
+echo " "
+echo " "
+
+read -p "Logout now? (y/n): " logout_now
+if [[ "${logout_now,,}" == "y" ]]; then
+  xfce4-session-logout --logout --fast
+fi
