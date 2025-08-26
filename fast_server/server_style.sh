@@ -49,9 +49,6 @@ xfce4-panel -r
 #xfconf-query -c xfce4-panel -n -p /panels -a -t int -s 1
 #xfce4-panel -r
 
-#whisker
-xfce4-panel --add=whiskermenu || true &&
-xfce4-panel -r
 
 ## top panel to bottom
 #xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=10;x=0;y=0"
@@ -66,6 +63,10 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s -1
 #xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark" \
 #  || xfconf-query -c xfwm4 -n -p /general/theme -t string -s "Arc-Dark"
 #gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+
+#whisker
+xfce4-panel --add=whiskermenu || true &&
+xfce4-panel -r
 
 #change wallpaper
 sudo curl -fsSL https://raw.githubusercontent.com/NVainer/Stuff/main/ClickNet_wallpaper.png \
