@@ -11,6 +11,7 @@ echo -e "[daemon]\nDefaultSession=xfce.desktop" | sudo tee -a /etc/gdm3/custom.c
 echo -e "[User]\nXSession=xfce" | sudo tee /var/lib/AccountsService/users/$USER
 sudo chmod 644 /var/lib/AccountsService/users/$USER
 echo "xfce4-session" > ~/.xsession && chmod +x ~/.xsession
+sudo bash -c 'shopt -s nullglob; for f in /usr/share/xsessions/*.desktop /usr/share/wayland-sessions/*.desktop; do [[ "$f" == *xfce* ]] || mv "$f" "$f".disabled; done'
 
 sudo systemctl enable gdm3
 sudo reboot
