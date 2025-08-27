@@ -114,6 +114,13 @@ if [[ "${better_shell,,}" == "y" ]]; then
   echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> ~/.zshrc
 fi
 
+rm -rf ./white*
+
+#whisker
+xfce4-panel --add=whiskermenu || true &&
+xfce4-panel -r
+
+
 clear
 echo -e "\e[1;32m"
 figlet "All done!"
@@ -125,9 +132,7 @@ echo " "
 echo " "
 echo " "
 
-#whisker
-xfce4-panel --add=whiskermenu || true &&
-xfce4-panel -r
+
 
 read -p "Logout now? (y/n): " logout_now
 if [[ "${logout_now,,}" == "y" ]]; then
