@@ -63,7 +63,7 @@ xfdesktop --reload
 #install brave
 read -p "install Brave? (y/n): " install_brave
 if [[ "${install_brave,,}" == "y" ]]; then
-sudo curl -fsS https://dl.brave.com/install.sh | sudo bash
+  sudo curl -fsS https://dl.brave.com/install.sh | sudo bash
 fi
 
 read -p "setup RDP server? (y/n): " install_rdp
