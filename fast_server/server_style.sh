@@ -83,8 +83,9 @@ if [[ "${install_rdp,,}" == "y" ]]; then
   sudo ufw allow 3389/tcp
 fi
 
-if $FULL_INSTALL || { read -p 'install ZSH (better shell)? (y/n): ' better_shell && [[ "$better_shell" == "y" ]]; }; then
-  echo "install zsh..."
+
+read -p "install ZSH (better shell)? (y/n): " better_shell
+if [[ "${better_shell,,}" == "y" ]]; then
   sudo apt install zsh-common zsh-doc zsh
   # making zsh default
   sudo chsh -s $(which zsh) "$USER"
