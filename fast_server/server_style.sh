@@ -113,7 +113,7 @@ if [[ "${better_shell,,}" == "y" ]]; then
   echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> ~/.zshrc
 fi
 
-rm -rf ./white*
+rm -rf ./WhiteSur*
 
 #whisker
 xfce4-panel --add=whiskermenu || true &&
