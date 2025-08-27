@@ -162,7 +162,6 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 sudo usermod -aG docker $USER # (to run docker without sudo)
-newgrp docker # or logout
 sleep 1
 
 #add webcheck image yaml
@@ -176,7 +175,7 @@ services:
     restart: unless-stopped
 EOF
 sleep 1
-docker compose up -d
+sudo docker compose up -d
 sleep 1
 
 #whisker
