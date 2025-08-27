@@ -1,7 +1,7 @@
 #style
 # 1) Deps (small)
 sudo apt update && sudo apt-get upgrade -y
-sudo apt install -y git sassc xfce4-whiskermenu-plugin libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine figlet
+sudo apt install -y git sassc xfce4-whiskermenu-plugin libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine figlet &&
 
 # 2) Get the theme + install (Dark)
 git clone --depth=1 https://github.com/vinceliuice/WhiteSur-gtk-theme.git
@@ -10,13 +10,13 @@ cd WhiteSur-gtk-theme
 # (Optional) also theme GTK4/libadwaita apps:
 ./install.sh -l -c dark
 cd ..
-
+sleep 1
 # 3) (Optional) Icons to match
 git clone --depth=1 https://github.com/vinceliuice/WhiteSur-icon-theme.git
 cd WhiteSur-icon-theme
 ./install.sh             # installs "WhiteSur" icons into ~/.local/share/icons
 cd ..
-
+sleep 1
 # 4) Apply in XFCE (no GUI clicks)
 xfconf-query -c xsettings -p /Net/ThemeName -s "WhiteSur-Dark" \
   || xfconf-query -c xsettings -n -p /Net/ThemeName -t string -s "WhiteSur-Dark"
@@ -25,7 +25,7 @@ xfconf-query -c xfwm4 -p /general/theme -s "WhiteSur-Dark" \
 xfconf-query -c xsettings -p /Net/IconThemeName -s "WhiteSur" \
   || xfconf-query -c xsettings -n -p /Net/IconThemeName -t string -s "WhiteSur"
 xfce4-panel -r
-
+sleep 2
 
 ##Remove Panel 2 (fuck my life, that was a real pain)
 #IDS=$(xfconf-query -c xfce4-panel -p /panels/panel-2/plugin-ids -v 2>/dev/null || echo)
@@ -44,10 +44,9 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s 0 || \
 xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s -1
 
 ## set dark mode
-#gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+xfconf-query -c xfce4-panel -p /panels/dark-mode -s true 2>/dev/null || true
 
-
-
+sleep 1
 #change wallpaper
 sudo curl -fsSL https://raw.githubusercontent.com/NVainer/Stuff/main/ClickNet_wallpaper.png \
   -o /usr/share/xfce4/backdrops/ClickNet_wallpaper.png
