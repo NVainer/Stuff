@@ -1,7 +1,7 @@
 #style
 # 1) Deps (small)
-sudo apt update
-sudo apt install -y git sassc libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine figlet
+sudo apt update && sudo apt-get upgrade -y
+sudo apt install -y git sassc xfce4-whiskermenu-plugin libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine figlet
 
 # 2) Get the theme + install (Dark)
 git clone --depth=1 https://github.com/vinceliuice/WhiteSur-gtk-theme.git
@@ -27,20 +27,6 @@ xfconf-query -c xsettings -p /Net/IconThemeName -s "WhiteSur" \
 xfce4-panel -r
 
 
-
-
-
-
-## install themes
-#sudo apt install -y xfce4-whiskermenu-plugin papirus-icon-theme arc-theme &&
-
-## apply
-#xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Darker"
-#xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
-#xfconf-query -c xsettings -p /Gtk/CursorThemeName -s "Breeze"
-#xfconf-query -c xfwm4 -p /general/theme -s "Arc-Darker"
-
-
 ##Remove Panel 2 (fuck my life, that was a real pain)
 #IDS=$(xfconf-query -c xfce4-panel -p /panels/panel-2/plugin-ids -v 2>/dev/null || echo)
 #for i in $IDS; do xfconf-query -c xfce4-panel -p "/plugins/plugin-$i" -r -R 2>/dev/null; done
@@ -58,15 +44,9 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s 0 || \
 xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s -1
 
 ## set dark mode
-#xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark" \
-#  || xfconf-query -c xsettings -n -p /Net/ThemeName -t string -s "Arc-Dark"
-#xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark" \
-#  || xfconf-query -c xfwm4 -n -p /general/theme -t string -s "Arc-Dark"
 #gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
 
-#whisker
-xfce4-panel --add=whiskermenu || true &&
-xfce4-panel -r
+
 
 #change wallpaper
 sudo curl -fsSL https://raw.githubusercontent.com/NVainer/Stuff/main/ClickNet_wallpaper.png \
@@ -81,14 +61,9 @@ done
 xfdesktop --reload
 
 #install brave
+read -p "install Brave? (y/n): " install_brave
+if [[ "${install_brave,,}" == "y" ]]; then
 sudo curl -fsS https://dl.brave.com/install.sh | sudo bash
-
-
-read -p "Disable SSH? (y/n): " disable_ssh
-if [[ "${disable_ssh,,}" == "y" ]]; then
-  echo "Disabling SSH service..."
-  sudo systemctl disable ssh
-  sudo systemctl stop ssh
 fi
 
 read -p "setup RDP server? (y/n): " install_rdp
@@ -106,7 +81,6 @@ if [[ "${install_rdp,,}" == "y" ]]; then
   sudo systemctl enable xrdp
   sudo systemctl restart xrdp
   sudo ufw allow 3389/tcp
-  sudo systemctl status xrdp
 fi
 
 if $FULL_INSTALL || { read -p 'install ZSH (better shell)? (y/n): ' better_shell && [[ "$better_shell" == "y" ]]; }; then
@@ -149,6 +123,10 @@ echo -e "\e[0m"
 echo " "
 echo " "
 echo " "
+
+#whisker
+xfce4-panel --add=whiskermenu || true &&
+xfce4-panel -r
 
 read -p "Logout now? (y/n): " logout_now
 if [[ "${logout_now,,}" == "y" ]]; then
