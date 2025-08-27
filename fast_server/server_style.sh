@@ -27,6 +27,19 @@ xfconf-query -c xsettings -p /Net/IconThemeName -s "WhiteSur" \
 xfce4-panel -r
 sleep 2
 
+# Hide Home
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-home \
+  --create -t bool -s false
+
+# Hide File System
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-filesystem \
+  --create -t bool -s false
+
+# Hide Trash
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-trash \
+  --create -t bool -s false
+
+sleep 1
 ##Remove Panel 2 (fuck my life, that was a real pain)
 #IDS=$(xfconf-query -c xfce4-panel -p /panels/panel-2/plugin-ids -v 2>/dev/null || echo)
 #for i in $IDS; do xfconf-query -c xfce4-panel -p "/plugins/plugin-$i" -r -R 2>/dev/null; done
@@ -81,6 +94,20 @@ if [[ "${install_rdp,,}" == "y" ]]; then
   sudo systemctl restart xrdp
   sudo ufw allow 3389/tcp
 fi
+sleep 1
+
+
+
+
+#essential security
+read -p "Care about security? (y/n): " install_sec
+if [[ "${install_sec,,}" == "y" ]]; then
+  sudo apt install -y timeshift gufw fail2ban apparmor apparmor-utils keepassxc
+  sudo systemctl enable fail2ban apparmor
+  sudo ufw enable
+fi
+sleep 1
+
 
 
 read -p "install ZSH (better shell)? (y/n): " better_shell
@@ -114,6 +141,43 @@ if [[ "${better_shell,,}" == "y" ]]; then
 fi
 
 rm -rf ./WhiteSur*
+
+
+#install docker
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+sleep 1
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+sudo usermod -aG docker $USER # (to run docker without sudo)
+newgrp docker # or logout
+sleep 1
+
+#add webcheck image yaml
+cat > docker-compose.yml <<'EOF'
+services:
+  web-check:
+    image: lissy93/web-check:latest
+    container_name: web-check
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+EOF
+sleep 1
+docker compose up -d
+sleep 1
 
 #whisker
 xfce4-panel --add=whiskermenu || true &&
