@@ -1,7 +1,7 @@
 #style
 # 1) Deps (small)
 sudo apt update && sudo apt-get upgrade -y
-sudo apt install -y git sassc xfce4-whiskermenu-plugin libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine figlet ufw &&
+sudo apt install -y git sassc xfce4-whiskermenu-plugin libglib2.0-dev-bin libxml2-utils gtk2-engines-murrine figlet ufw nano &&
 sudo ufw enable
 # 2) Get the theme + install (Dark)
 git clone --depth=1 https://github.com/vinceliuice/WhiteSur-gtk-theme.git
