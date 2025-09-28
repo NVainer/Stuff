@@ -70,7 +70,7 @@ done
 for p in $(xfconf-query -c xfce4-desktop -l | grep '/image-style$'); do
   xfconf-query -c xfce4-desktop -p "$p" -s 5
 done
-xfdesktop --reload
+
 
 #install brave
 read -p "install Brave? (y/n): " install_brave
@@ -115,7 +115,7 @@ rm -rf ./WhiteSur*
 #whisker
 xfce4-panel --add=whiskermenu || true &&
 xfce4-panel -r
-
+xfdesktop --reload
 
 clear
 echo -e "\e[1;32m"
