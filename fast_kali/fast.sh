@@ -8,7 +8,7 @@ else
 fi
 
 # increase terminal
-printf '\e[8;28;125t'  # Set rows=40, cols=110
+printf '\e[8;28;105t'  # Set rows=40, cols=110
 
 # Get current profile
 PROFILE_ID=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d \')
