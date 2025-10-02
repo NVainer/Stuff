@@ -74,10 +74,19 @@ sudo apt-get update && sudo apt install -y git curl flatpak figlet ubuntu-restri
 
 if $FULL_INSTALL || { read -p "Install Dev stuff? (y/n): " dev_choice && [[ "$dev_choice" == "y" ]]; }; then
   echo "Installing dev tools..."
-  sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager docker.io docker-compose-v2 swtpm wl-clipboard -y
+  sudo apt install golang qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager docker.io docker-compose-v2 swtpm wl-clipboard -y
   sudo usermod -aG libvirt $(whoami)
   sudo usermod -aG kvm $(whoami)
+  sudo snap install --classic code
+  vscode_desktop="code_code.desktop"
+  gsettings set org.gnome.shell favorite-apps "$(gsettings get org.gnome.shell favorite-apps | sed "s/]$/, '${vscode_desktop}']/")"
+  wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo tee /etc/apt/keyrings/sublimehq-pub.asc > /dev/null
+  echo -e 'Types: deb\nURIs: https://download.sublimetext.com/\nSuites: apt/stable/\nSigned-By: /etc/apt/keyrings/sublimehq-pub.asc' | sudo tee /etc/apt/sources.list.d/sublime-text.sources
+  sudo apt-get update
+  sudo apt install sublime-text -y
 fi
+
+
 
 if $FULL_INSTALL || { read -p "Do you care about security/backup? (y/n): " sec_choice && [[ "$sec_choice" == "y" ]]; }; then
   echo "Installing security/backup tools..."
