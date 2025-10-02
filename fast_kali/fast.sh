@@ -90,9 +90,37 @@ if $FULL_INSTALL || { read -p "Do you care about security/backup? (y/n): " sec_c
 fi
 
 
-# remove Firefox
+
+# remove firefox from snap and install it normally with apt
 sudo snap remove firefox
-sudo apt-get upgrade -y
+sudo apt purge firefox -y
+#Add Mozilla PPA
+sudo add-apt-repository ppa:mozillateam/ppa -y
+echo '
+Package: *
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1001
+' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+
+sudo apt update
+sudo apt install firefox -y
+timeout 5s firefox --headless || true
+
+# install foxyproxy
+sudo mkdir -p /etc/firefox/policies
+sudo tee /etc/firefox/policies/policies.json >/dev/null <<'EOF'
+{
+  "policies": {
+    "Extensions": {
+      "Install": [
+        "https://addons.mozilla.org/firefox/downloads/latest/foxyproxy-standard/latest.xpi"
+      ]
+    }
+  }
+}
+EOF
+
+
 if $FULL_INSTALL || { read -p 'Install Brave browser? ¯\_( ͡° ͜ʖ ͡°)_/¯ (y/y): ' brave_choice && [[ "$brave_choice" == "y" ]]; }; then
   echo "Installing Brave browser..."
   if ! sudo curl -fsS https://dl.brave.com/install.sh | sudo bash; then
@@ -236,6 +264,12 @@ curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/t
 chmod +x msfinstall
 sudo ./msfinstall
 msfdb init
+
+# installing burp
+wget -O burpsuite_community_linux_2025.8.7.sh \
+  "https://portswigger-cdn.net/burp/releases/download?product=community&version=2025.8.7&type=Linux&format=Sh"
+chmod +x burpsuite_community_linux_2025.8.7.sh
+./burpsuite_community_linux_2025.8.7.sh
 
 
 if $FULL_INSTALL || { read -p "Want to create system backup with Timeshift now? (y/n): " backup_choice && [[ "$backup_choice" == "y" ]]; }; then
