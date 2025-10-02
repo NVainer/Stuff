@@ -78,12 +78,21 @@ if $FULL_INSTALL || { read -p "Install Dev stuff? (y/n): " dev_choice && [[ "$de
   sudo usermod -aG libvirt $(whoami)
   sudo usermod -aG kvm $(whoami)
   sudo snap install --classic code
+  # pin sublime to dock
   vscode_desktop="code_code.desktop"
   gsettings set org.gnome.shell favorite-apps "$(gsettings get org.gnome.shell favorite-apps | sed "s/]$/, '${vscode_desktop}']/")"
   wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo tee /etc/apt/keyrings/sublimehq-pub.asc > /dev/null
   echo -e 'Types: deb\nURIs: https://download.sublimetext.com/\nSuites: apt/stable/\nSigned-By: /etc/apt/keyrings/sublimehq-pub.asc' | sudo tee /etc/apt/sources.list.d/sublime-text.sources
   sudo apt-get update
   sudo apt install sublime-text -y
+  # pin sublime to dock
+  sublime_desktop="sublime_text.desktop"
+  gsettings set org.gnome.shell favorite-apps "$(gsettings get org.gnome.shell favorite-apps | sed "s/]$/, '${sublime_desktop}']/")"
+  # make sublime default
+  xdg-mime default sublime_text.desktop text/plain
+  # pin terminal to dock
+  terminal_desktop="org.gnome.Terminal.desktop"
+  gsettings set org.gnome.shell favorite-apps "$(gsettings get org.gnome.shell favorite-apps | sed "s/]$/, '${terminal_desktop}']/")"
 fi
 
 
@@ -129,7 +138,6 @@ sudo tee /etc/firefox/policies/policies.json >/dev/null <<'EOF'
 }
 EOF
 
-
 if $FULL_INSTALL || { read -p 'Install Brave browser? ¯\_( ͡° ͜ʖ ͡°)_/¯ (y/y): ' brave_choice && [[ "$brave_choice" == "y" ]]; }; then
   echo "Installing Brave browser..."
   if ! sudo curl -fsS https://dl.brave.com/install.sh | sudo bash; then
@@ -149,36 +157,32 @@ if $FULL_INSTALL || { read -p 'improve style? ♣ (y/n): ' beautify && [[ "$beau
   # enable dark mode
   gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
   gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-purple-dark' 
-
   # hide home folder
   gsettings set org.gnome.shell.extensions.ding show-home false
-
   # Move Dock to Bottom
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
-
   # auto hide dock
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
-
   # disable dock "panel mode"
   gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
-
   # change icon size to 60
   gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 60
-
   # unpin Help from dock
   gsettings set org.gnome.shell favorite-apps "$(gsettings get org.gnome.shell favorite-apps | sed "s/, 'yelp.desktop'//; s/'yelp.desktop', //; s/'yelp.desktop'//")"
-
   # add ALT + SHIFT for layout change
   gsettings set org.gnome.desktop.input-sources xkb-options "['grp:alt_shift_toggle', 'lv3:ralt_switch']"
-
   # add Hebrew as a secondery lang
   gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'il')]"
-
   # set default "last modified" in file explorer
   gsettings set org.gnome.nautilus.preferences default-sort-order 'mtime'
   gsettings set org.gnome.nautilus.preferences default-sort-in-reverse-order true
-
-
+  # add utilities to upper bar
+  gnome-extensions enable system-monitor@gnome-shell-extensions.gcampax.github.com
+  gnome-extensions enable apps-menu@gnome-shell-extensions.gcampax.github.com
+  gnome-extensions enable places-menu@gnome-shell-extensions.gcampax.github.com
+  gnome-extensions enable workspace-indicator@gnome-shell-extensions.gcampax.github.com
+  # enable Do Not Disturb
+  gsettings set org.gnome.desktop.notifications show-banners false
 fi
 
 if $FULL_INSTALL || { read -p 'install ZSH (better shell)? (y/n): ' better_shell && [[ "$better_shell" == "y" ]]; }; then
